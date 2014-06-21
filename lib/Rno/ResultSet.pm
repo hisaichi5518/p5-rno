@@ -8,6 +8,7 @@ use String::CamelCase qw(decamelize);
 use SQL::Maker;
 use List::Util qw(pairkeys);
 use Mouse;
+use Rno::Exceptions;
 
 has conditions => (
     is => "ro",
@@ -86,10 +87,12 @@ sub single {
     my ($class, @conditions) = @_;
 
     if (blessed $class && !@conditions) {
-        return $class->select({limit => 1})->first;
+        return $class->select({limit => 1})->first
+            or Rno::Exception::NotFoundResult->throw;
     }
 
-    $class->select(@conditions, {limit => 1})->first;
+    $class->select(@conditions, {limit => 1})->first
+        or Rno::Exception::NotFoundResult->throw;
 }
 
 sub all {

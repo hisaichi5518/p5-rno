@@ -116,4 +116,13 @@ subtest "Foo.single(...)" => sub {
     isa_ok $row, "MyApp::DB::Foo::Result";
 };
 
+subtest "Foo.single(...) is not found" => sub {
+    eval {
+        MyApp::DB::Foo->single(
+            name => 404,
+        );
+    };
+    isa_ok $@, "Rno::Exception::NotFoundResult";
+};
+
 done_testing;
