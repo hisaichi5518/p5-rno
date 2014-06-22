@@ -4,12 +4,14 @@ use strict;
 use warnings;
 
 use SQL::Maker;
+use Class::Load;
 use Carp qw(croak);
 use List::Util qw(pairkeys);
 use Scalar::Util qw(blessed);
 use String::CamelCase qw(decamelize);
 
 use Rno::DBI;
+use Rno::Result;
 use Rno::Exceptions;
 
 sub connect_info {
@@ -36,6 +38,18 @@ sub set_columns { # TODO: rename
     *{$class . "::column_names"} = sub { @column_names };
     *{$class . "::table_name"}   = sub { $table_name   };
     *{$class . "::result_class"} = sub { $result_class };
+
+    Class::Load::load_optional_class($result_class)
+        or $class->generate_result_class;
+
+    $result_class->generate_column_accessors(@column_names);
+}
+
+sub generate_result_class {
+    my ($class) = @_;
+
+    no strict 'refs';
+    @{$class->result_class . "::ISA"} = ("Rno::Result");
 }
 
 sub build_table_name {
@@ -97,7 +111,7 @@ sub all {
     );
 
     my $rows = $self->dbh->select_all($sql, @bind);
-    map { bless { %$_ }, $self->result_class } @$rows;
+    map { bless { columns => $_ }, $self->result_class } @$rows;
 }
 
 sub first {
