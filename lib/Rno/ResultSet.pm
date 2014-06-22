@@ -86,5 +86,40 @@ sub select {
     );
 }
 
+sub all {
+    my ($self) = @_;
+
+    my ($sql, @bind) = $self->sql_maker->select(
+        $self->table_name,
+        [map { $self->table_name . "." .  $_ } $self->column_names],
+        $self->condition,
+        $self->options,
+    );
+
+    my $rows = $self->dbh->select_all($sql, @bind);
+    map { bless { %$_ }, $self->result_class } @$rows;
+}
+
+sub first {
+    my ($self) = @_;
+    ($self->all)[0];
+}
+
+sub single {
+    my ($self, @conditions) = @_;
+
+    my ($sql, @bind) = $self->sql_maker->select(
+        $self->table_name,
+        [map { $self->table_name . "." .  $_ } $self->column_names],
+        [@{$self->condition}, @conditions],
+        {%{$self->options}, limit => 1},
+    );
+
+    if (my $raw_row = $self->dbh->select_row($sql, @bind)) {
+        return bless { %$raw_row }, $self->result_class;
+    }
+
+    Rno::Exception::NotFoundResult->throw;
+}
 
 1;
