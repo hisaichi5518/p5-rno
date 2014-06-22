@@ -1,7 +1,25 @@
 package Rno::ResultSet;
+use 5.10.1;
 use strict;
 use warnings;
+
+use SQL::Maker;
+use Carp qw(croak);
 use Scalar::Util qw(blessed);
+
+use Rno::DBI;
+
+sub connect_info {
+    croak 'Method "connect_info" not implemented in subclass';
+}
+
+sub dbh {
+    state $dbh = Rno::DBI->connect(shift->connect_info);
+}
+
+sub sql_maker {
+    state $sm = SQL::Maker->new(driver => "mysql");
+}
 
 sub new {
     my $class = shift;
