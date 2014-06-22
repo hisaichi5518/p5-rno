@@ -5,6 +5,7 @@ use utf8;
 use parent "Exporter";
 use DBIx::Sunny;
 use Test::mysqld;
+use t::Schema;
 
 our @EXPORT = qw(
     setup_database
