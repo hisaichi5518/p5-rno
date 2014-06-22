@@ -40,7 +40,7 @@ sub setup_database {
     my $dbh = DBIx::Sunny->connect($mysqld->dsn(dbname => "test"));
 
     $dbh->do($_) for split ";\n", <<"...";
-CREATE TABLE `City` (
+CREATE TABLE `city` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` char(35) NOT NULL DEFAULT '',
   `CountryCode` char(3) NOT NULL DEFAULT '',
@@ -50,7 +50,7 @@ CREATE TABLE `City` (
   KEY `CountryCode` (`CountryCode`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4080 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `Country` (
+CREATE TABLE `country` (
   `Code` char(3) NOT NULL DEFAULT '',
   `Name` char(52) NOT NULL DEFAULT '',
   `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
@@ -69,7 +69,7 @@ CREATE TABLE `Country` (
   PRIMARY KEY (`Code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `CountryLanguage` (
+CREATE TABLE `country_language` (
   `CountryCode` char(3) NOT NULL DEFAULT '',
   `Language` char(30) NOT NULL DEFAULT '',
   `IsOfficial` enum('T','F') NOT NULL DEFAULT 'F',
@@ -78,10 +78,10 @@ CREATE TABLE `CountryLanguage` (
   KEY `CountryCode` (`CountryCode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `City` (`ID`, `Name`, `CountryCode`, `District`, `Population`)
+INSERT INTO `city` (`ID`, `Name`, `CountryCode`, `District`, `Population`)
 VALUES (1,'Kabul','AFG','Kabol',1780000);
 
-INSERT INTO `Country` (
+INSERT INTO `country` (
     `Code`,
     `Name`,
     `Continent`,
@@ -115,7 +115,7 @@ INSERT INTO `Country` (
     'AF'
 );
 
-INSERT INTO `CountryLanguage` (`CountryCode`, `Language`, `IsOfficial`, `Percentage`)
+INSERT INTO `country_language` (`CountryCode`, `Language`, `IsOfficial`, `Percentage`)
 VALUES
     ('AFG','Balochi','F',0.9),
     ('AFG','Dari','T',32.1),
