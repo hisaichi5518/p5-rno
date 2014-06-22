@@ -137,7 +137,7 @@ sub single {
     );
 
     if (my $raw_row = $self->dbh->select_row($sql, @bind)) {
-        return bless { %$raw_row }, $self->result_class;
+        return bless { columns => $raw_row }, $self->result_class;
     }
 
     Rno::Exception::NotFoundResult->throw;
