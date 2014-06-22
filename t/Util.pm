@@ -123,6 +123,12 @@ VALUES
     ('AFG','Uzbek','F',8.8);
 ...
 
+package t::Schema::ResultSet {
+    sub connect_info {
+        $mysqld->dsn(dbname => "test");
+    }
+}
+
     $mysqld;
 }
 1;
