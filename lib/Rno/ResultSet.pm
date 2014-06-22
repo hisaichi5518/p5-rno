@@ -7,8 +7,10 @@ use SQL::Maker;
 use Carp qw(croak);
 use List::Util qw(pairkeys);
 use Scalar::Util qw(blessed);
+use String::CamelCase qw(decamelize);
 
 use Rno::DBI;
+use Rno::Exceptions;
 
 sub connect_info {
     croak 'Method "connect_info" not implemented in subclass';
@@ -22,16 +24,33 @@ sub sql_maker {
     state $sm = SQL::Maker->new(driver => "mysql");
 }
 
-sub set_columns {
+sub set_columns { # TODO: rename
     my ($class, @columns) = @_;
 
+    my @column_names = pairkeys @columns;
+    my $table_name   = $class->build_table_name;
+    my $result_class = $class->build_result_class;
+
     no strict "refs";
-    *{$class . "::columns"} = sub { @columns };
+    *{$class . "::columns"}      = sub { @columns      };
+    *{$class . "::column_names"} = sub { @column_names };
+    *{$class . "::table_name"}   = sub { $table_name   };
+    *{$class . "::result_class"} = sub { $result_class };
 }
 
-sub column_names {
-    my ($class) = @_;
-    pairkeys $class->columns;
+sub build_table_name {
+    my ($class) = blessed($_[0]) || $_[0];
+
+    my $name = (split "::", $class)[-1];
+    decamelize($name);
+}
+
+sub build_result_class {
+    my ($self) = @_;
+    my $class = blessed($self) || $self;
+
+    $class =~ s/ResultSet/Result/;
+    $class;
 }
 
 sub new {
