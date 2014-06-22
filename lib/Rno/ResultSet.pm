@@ -72,8 +72,15 @@ sub new {
     bless {@_}, ref($class) || $class;
 }
 
-sub condition { shift->{condition} ||= [] }
-sub options   { shift->{options}   ||= {} }
+sub condition {
+    my ($self) = @_;
+    ref($self) ? $self->{condition} ||= [] : [];
+}
+
+sub options {
+    my ($self) = @_;
+    ref($self) ? $self->{options} ||= {} : {};
+}
 
 sub select {
     my $class = shift;
