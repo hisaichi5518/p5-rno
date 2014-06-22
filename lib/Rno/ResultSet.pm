@@ -143,4 +143,24 @@ sub single {
     Rno::Exception::NotFoundResult->throw;
 }
 
+sub update {
+    my ($self, @args) = @_;
+    my ($sql, @binds) = $self->sql_maker->update(
+        $self->table_name,
+        \@args,
+        $self->condition,
+    );
+    $self->dbh->query($sql, @binds);
+}
+
+sub delete {
+    my ($self) = @_;
+    my ($sql, @binds) = $self->sql_maker->delete(
+        $self->table_name,
+        $self->condition,
+        $self->options,
+    );
+    $self->dbh->query($sql, @binds);
+}
+
 1;
