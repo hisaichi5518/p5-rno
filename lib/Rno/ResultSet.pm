@@ -5,6 +5,7 @@ use warnings;
 
 use SQL::Maker;
 use Carp qw(croak);
+use List::Util qw(pairkeys);
 use Scalar::Util qw(blessed);
 
 use Rno::DBI;
@@ -19,6 +20,18 @@ sub dbh {
 
 sub sql_maker {
     state $sm = SQL::Maker->new(driver => "mysql");
+}
+
+sub set_columns {
+    my ($class, @columns) = @_;
+
+    no strict "refs";
+    *{$class . "::columns"} = sub { @columns };
+}
+
+sub column_names {
+    my ($class) = @_;
+    pairkeys $class->columns;
 }
 
 sub new {
@@ -53,5 +66,6 @@ sub select {
         options   => $new_options,
     );
 }
+
 
 1;
